@@ -1,5 +1,6 @@
 const {Op} = require('sequelize');
 const { Contract } = require('../model');
+const { constants } = require('../../constants');
 
 const getContractById = async(req) => {
     const {Contract} = req.app.get('models');
@@ -20,7 +21,7 @@ const getUserNonTerminatedContracts = async(req) => {
         where:{
             [Op.or]:[{ContractorId: profileId}, {ClientId: profileId}],
             status:{
-                [Op.ne]: 'terminated',
+                [Op.ne]: constants.statusTerminated,
             },
         },
     });

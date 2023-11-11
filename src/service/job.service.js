@@ -1,5 +1,6 @@
 const httpStatus = require('http-status');
 const { Op } = require('sequelize');
+const {constants} = require('../../constants');
 
 const getJobById = async(req) => {
   const {Job} = req.app.get('models');
@@ -28,7 +29,7 @@ const getUnpaidJobs = async(req) => {
               where: {
                 [Op.or]: [{ ContractorId: profileId }, { ClientId: profileId }],
                 status: {
-                  [Op.eq]: 'in_progress',
+                  [Op.eq]: constants.statusInprogress,
                 },
               },
             },
@@ -54,7 +55,7 @@ const payJob = async(req) => {
       {
         model: Contract,
         where: {
-          status: 'in_progress', 
+          status: constants.statusInprogress, 
           ClientId: id
         },
       }
@@ -68,7 +69,7 @@ const payJob = async(req) => {
   const contractor = await Profile.findOne({
     where: {
       id: job.Contract.ContractorId,
-      type: "contractor"
+      type: constants.profileTypeContractor
     }
   });
   
@@ -79,7 +80,7 @@ const payJob = async(req) => {
     await contractor.increment({ balance: job.price}, {transaction: paymentTransaction});
     await job.update({paid: true, paymentDate: Date.now()},{transaction: paymentTransaction});
 
-    await transaction.commit();
+    await paymentTransaction.commit();
     return job;
   } catch(error) {
     await transaction.rollback();

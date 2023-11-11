@@ -4,12 +4,14 @@ const adminService = require('../service/adminService');
 
 const getBestProfession = async(req, res) => {
     try{
-        const bestProfession = await adminService.getBestProfession(req);
+        const result = await adminService.getBestProfession(req);
 
-        if(!bestProfession) {
+        if(!result) {
             res.status(httpStatus.NOT_FOUND).json({message: 'No best profession found'});
+        } else if(typeof result === 'string' && result.includes('Invalid date format')){
+            res.status(httpStatus.BAD_REQUEST).json({message: 'Invalid date format'});
         } else {
-            res.status(httpStatus.OK).json(bestProfession);
+            res.status(httpStatus.OK).json(result);
         }
     } catch(error) {
         console.trace(error);
@@ -19,11 +21,15 @@ const getBestProfession = async(req, res) => {
 
 const getBestClients = async(req, res) => {
     try{
-        const bestClients = await adminService.getBestClients(req);
-        if(!bestClients) {
+        const result = await adminService.getBestClients(req);
+        if(!result) {
             res.status(httpStatus.NOT_FOUND).json({message: 'No best clients found'});
+        } else if(typeof result === 'string' && result.includes('Invalid date format')){
+            res.status(httpStatus.BAD_REQUEST).json({message: 'Invalid date format'});
+        } else if(typeof result === 'string' && result.includes('Limit must be a number')){
+            res.status(httpStatus.BAD_REQUEST).json({message: 'Limit must be a number'})
         } else {
-            res.status(httpStatus.OK).json(bestClients);
+            res.status(httpStatus.OK).json(result);
         }
     } catch(error){
         console.trace(error);

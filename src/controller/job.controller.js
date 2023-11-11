@@ -25,13 +25,19 @@ const payJob = async(req, res) => {
             res.status(httpStatus.OK).json(response);
         }
     } catch(error) {
-        res.status(httpStatus.INTERNAL_SERVER_ERROR).json({message: 'Error occurred while paying for a job', error});
+        console.trace(error);
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json({message: `Error occurred while paying for a jobid ${req.params.id}`, error});
     }
 };
 
  const getJobById = async(req,res) => {
-     const response = await jobService.getJobById(req);
-     res.status(200).json(response);
+     try{
+        const response = await jobService.getJobById(req);
+        res.status(200).json(response);
+     } catch(error) {
+         res.status(httpStatus.INTERNAL_SERVER_ERROR).json({message: 'Error while fetching job details'});
+     }
+     
  }
 
 

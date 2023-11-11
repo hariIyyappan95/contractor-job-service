@@ -1,3 +1,13 @@
+const {constants} = require('../../constants');
+
+const getProfileById = async(req) => {
+    const {Profile} = req.app.get('models');
+    const res = await Profile.findOne({
+        where: { id: req.params.id}
+  });
+  return res;
+}
+
 const deposit = async(req) => {
     const clientId = req.params.userId;
     const depositAmount = req.body.amount;
@@ -22,7 +32,7 @@ const deposit = async(req) => {
                      required: true,
                      where: {
                          clientId: clientId,
-                         status: 'in_progress',
+                         status: constants.statusInprogress,
                      },
                     },
                 ],
@@ -38,7 +48,7 @@ const deposit = async(req) => {
             response = `There are no unpaid jobs for client ${clientId}`;
         }
 
-        const depositThreshold = totalPrice * 0.25; //todo: add constant
+        const depositThreshold = totalPrice * constants.depositAmountLimitPercentage;
         if(depositAmount > depositThreshold) {
             response = `Maximum deposit amount reached. Deposit ${depositAmount} is more than 25% of client ${clientId} total of jobs to pay`;
         } else {
@@ -56,4 +66,5 @@ const deposit = async(req) => {
 
 module.exports = {
     deposit,
+    getProfileById,
 };

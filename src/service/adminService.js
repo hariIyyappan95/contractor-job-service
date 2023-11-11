@@ -1,3 +1,5 @@
+const { constants } = require('../../constants');
+
 const getBestProfession = async(req) => {
     const {Job, Contract, Profile} = req.app.get('models');
     const {Op} = require('sequelize');
@@ -21,7 +23,7 @@ const getBestProfession = async(req) => {
                     {
                         model: Profile,
                         as: 'Contractor',
-                        where: {type: 'contractor'}
+                        where: {type: constants.profileTypeContractor}
                     }
                 ]
             }
@@ -51,6 +53,7 @@ const getStartAndEndDate = async(start, end) => {
     endDate.setUTCHours(23,59,59,999);
     return {startDate, endDate};
 }
+
 const getBestClients = async(req, res) => {
     const sequelize = req.app.get('sequelize');
     const {Op} = require('sequelize');
@@ -58,10 +61,11 @@ const getBestClients = async(req, res) => {
     const {start, end, limit} = req.query;
 
     const {startDate, endDate} = await getStartAndEndDate(start, end);
+    
     const countLimit = parseInt(limit ? limit : 2);
 
     if(startDate == 'Invalid Date' || endDate == 'Invalid Date') return 'Invalid date format';
-    if(isNaN(countLimit)) return 'Limit must be a number'; //todo: handle in controller
+    if(isNaN(countLimit)) return 'Limit must be a number';
 
     const paidJobsForPeriod = await Job.findAll({
         attributes: [[sequelize.fn('sum', sequelize.col('price')), 'totalPaid']],
@@ -79,7 +83,7 @@ const getBestClients = async(req, res) => {
                     {
                         model: Profile,
                         as: 'Client',
-                        where: {type: 'client'},
+                        where: {type: constants.profileTypeClient},
                         attributes: ['firstName', 'lastName']
                     }
                 ],
